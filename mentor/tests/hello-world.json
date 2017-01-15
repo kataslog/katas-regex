@@ -1,0 +1,18 @@
+[
+    {
+        "line": "hello world",
+        "correct": true
+    },
+    {
+        "line": "some line with hello word in the middle",
+        "correct": true
+    },
+    {
+        "line": "some incorrect line",
+        "correct": false
+    },
+    {
+        "line": "another_line_with_hello world",
+        "correct": true
+    }
+]

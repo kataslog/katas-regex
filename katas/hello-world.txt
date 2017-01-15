@@ -1,0 +1,5 @@
+# hello-world kata
+#
+# Select lines which contans 'hello world' string
+
+# hello\sworld
