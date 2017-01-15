@@ -29,6 +29,9 @@ def fetch_solution(path, name):
         if len(lines) > 1:
             print "Incorrect solution. More than one solution strings."
             sys.exit(1)
+        if not any(lines):
+            print "Solution is not found"
+            sys.exit(1)
 
         return lines[0]
 
@@ -36,18 +39,16 @@ def test(path, name):
     test_data = fetch_test_data(name)
     solution = fetch_solution(path, name)
 
+    info = {'name': name, 'solution': solution, 'answers': [], 'tests_count': len(test_data)}
+
     regex = re.compile(solution)
     correct_count = 0
     for test in test_data:
         line = test["line"]
-        is_correct = regex.match(line) == test("correct")
+        is_correct = (regex.search(line) is not None) is test["correct"]
+        info['answers'].append({'line': line, 'is_correct': is_correct})
 
-        print_result(line, is_correct)
-        correct_count += 1 if is_correct else 0
-
-    incorrect_count = len(test_data) - correct_count
-    print_stats(correct_count, incorrect_count)
-
+    print_stats(info)
 
 def test_all(path):
     print "test all!"
@@ -58,17 +59,27 @@ def hint(name):
     for hint in hints:
         print hint
 
-def print_result(text, is_correct):
+def print_answer(text, is_correct):
     code, symbol = (OKCODE, u"\u2713") if is_correct else (FAILCODE, u"\u2717")
     print "%s%s  %s%s" % (code, symbol, text, ENDC)
 
-def print_stats(correct, incorrect):
+def print_stats(info):
+    print "kata: %s" % info['name']
+    print "solution: \'%s\'\n" % info['solution']
+
+    for answer in info['answers']:
+        print_answer(answer['line'], answer['is_correct'])
+
+    count = info['tests_count']
+    correct = len(filter(lambda x: x['is_correct'] is True, info['answers']))
+    incorrect = count - correct
+
     incorrect_string = "0" if incorrect == 0 else "%s%d%s" % (FAILCODE, incorrect, ENDC)
-    print "\nCorrect count: %d\nIncorrect count: %s" % (correct, incorrect_string)
+    print "\nTests count: %d\nCorrect count: %d\nIncorrect count: %s" % (count, correct, incorrect_string)
 
 def run(path, command, kata):
     if command == "test":
-        if not kata is None:
+        if kata is not None:
             test(path, kata)
         else:
             test_all(path)
